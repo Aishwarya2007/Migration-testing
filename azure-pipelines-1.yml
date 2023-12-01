@@ -34,5 +34,5 @@ steps:
     configuration: '$(buildConfiguration)'
 
 - publish: $(Build.ArtifactStagingDirectory)
-    artifact:drop
-    displayName:'Publish Artifacts'
+  artifact:  drop
+  displayName: 'Publish Artifacts'
