@@ -3,6 +3,7 @@ on:
   push:
     branches:
     - master
+  workflow_dispatch:
 env:
   buildConfiguration: Release
   buildPlatform: Any CPU
