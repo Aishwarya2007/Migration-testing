@@ -36,8 +36,8 @@ jobs:
       if: success() || failure()
       uses: actions/upload-artifact@v4.1.0
       with:
-        name: drop
-        path: "\\\\my\\share\\${{ github.workflow }}\\${{ github.run_number }}"
+        name: build-output
+        path: ${{ runner.temp }}/drop
     # NuGet does not accept glob patterns. Consider specifying files directly or using a solution.
     - name: NuGet restore
       run: nuget restore **/*.sln -Verbosity "Detailed"
