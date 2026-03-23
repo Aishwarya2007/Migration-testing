@@ -14,13 +14,26 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v4.1.0
-    - uses: nuget/setup-nuget@v1.2.0
-    - run: nuget restore ${{ env.solution }}
+
+    - name: Setup NuGet
+      uses: nuget/setup-nuget@v1.2.0
+
+    # THIS IS THE MISSING PIECE: Register the Azure feed with your secret token
+    - name: Authenticate NuGet with Azure DevOps
+      run: |
+        nuget sources add -Name "AzureDevOps" -Source "https://pkgs.dev.azure.com/aishuraja20/_packaging/YOUR_FEED_ID/nuget/v3/index.json" -Username "n/a" -Password "${{ secrets.AZURE_DEVOPS_TOKEN }}" -StorePasswordInClearText
+
+    - name: Restore NuGet Packages
+      run: nuget restore ${{ env.solution }}
+
     - name: install msbuild
       uses: microsoft/setup-msbuild@v1.3.1
+
     - name: run msbuild
       run: msbuild ${{ env.solution }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="${{ runner.temp }}" -p:Configuration=${{ env.buildConfiguration }} -p:Platform="${{ env.buildPlatform }}"
-    - uses: microsoft/vstest-action@v1.0.0
+
+    - name: Run Tests
+      uses: microsoft/vstest-action@v1.0.0
       with:
         testAssembly: |-
           **\*test*.dll
@@ -28,6 +41,7 @@ jobs:
           !**\obj\**
         searchFolder: "${{ github.workspace }}"
         platform: "${{ env.buildPlatform }}"
+
     - name: Publish Artifacts
       uses: actions/upload-artifact@v4.1.0
       with:
